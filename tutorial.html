@@ -1,0 +1,189 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Library Tutorial</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 50px; /* 50px offset from top */
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #ffffff, #f0f7ff);
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            opacity: 0;
+            animation: modalOpen 0.3s ease forwards;
+            margin-bottom: 2rem;
+        }
+        @keyframes modalOpen {
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .close {
+            font-size: 1.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #1f2937;
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f9fbfd;
+            border-radius: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%; /* Wider for mobile */
+            }
+            .modal-body {
+                max-height: 60vh;
+                font-size: 0.9rem;
+            }
+        }
+        /* Button Hover Effect */
+        .elegant-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center min-h-screen">
+    <div class="container mx-auto p-6">
+
+
+        <!-- Modal -->
+        <div id="tutorialModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="text-2xl font-bold text-blue-800">Tutorial AI Library</h2>
+                    <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+                <div class="modal-body prose prose-blue">
+                    <h3 class="text-xl font-semibold text-blue-700">AI Library Ilmu Falak & KHGT</h3>
+                    <p class="text-gray-700">
+                        <strong>Integrasi Kepustakaan Ilmu Falak & KHGT dengan AI (AI Library)</strong>
+                    </p>
+                    <p class="text-gray-600">
+                        Nah, sekarang kita bedah sedikit kode program aplikasi "AI Library" di <a href="https://hisabmu.com/ailib/" class="text-blue-500 underline" target="_blank">https://hisabmu.com/ailib/</a>. Aplikasi ini berfungsi sebagai jembatan yang memudahkan kita mengakses koleksi dokumen PDF (khususnya Ilmu Falak & KHGT) dan memadukannya dengan kecerdasan buatan seperti ChatGPT untuk memproses isi dokumen.
+                    </p>
+
+                    <h3 class="text-xl font-semibold text-blue-700 mt-6">Fitur dan Cara Pakai AI Library</h3>
+                    <ul class="list-disc pl-6 text-gray-600">
+                        <li>
+                            <strong>Download Langsung Aja (Pilihan 4)</strong>: Kalau kamu cuma mau ambil filenya tanpa interaksi AI, aplikasi ini juga menyediakan tombol langsung ke direktori dokumen aslinya. Jadi, bisa download PDF-nya kapan saja!
+                        </li>
+                        <li>
+                            <strong>Langsung Nyambung ke ChatGPT</strong>: Fitur "otak" dari AI Library ini adalah kemampuannya yang instan. Begitu kamu pilih dokumen dan instruksi (prompt), aplikasi bakal langsung membuka tab baru di browsermu, menuju ke ChatGPT, dengan prompt dan link dokumen yang sudah otomatis terisi. Jadi, kamu tinggal lihat hasilnya atau langsung ngobrol sama ChatGPT.
+                        </li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold text-blue-700 mt-6">Apa Gunanya Aplikasi Ini?</h3>
+                    <ul class="list-disc pl-6 text-gray-600">
+                        <li><strong>Akses Dokumen Gampang Banget</strong>: Enggak perlu repot nyari-nyari, semua dokumen Ilmu Falak & KHGT sudah terdata rapi.</li>
+                        <li><strong>Pahami Dokumen Lebih Cepat</strong>: Dengan bantuan AI, kamu bisa dapat ringkasan cepat, analisis singkat, atau bahkan ide artikel dari dokumen tebal dalam hitungan detik. Ini bantu banget buat riset atau belajar!</li>
+                        <li><strong>Fleksibel dan Sesuai Kebutuhan</strong>: Mau ringkasan umum? Bisa. Mau analisis mendalam dengan pertanyaan spesifik? Juga bisa! Kamu yang pegang kendali.</li>
+                        <li><strong>Dukung Riset dan Belajar</strong>: Aplikasi ini jadi alat yang powerful buat siapa saja yang mendalami Ilmu Falak dan KHGT, apalagi kalau butuh pemahaman cepat dari banyak sumber.</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold text-blue-700 mt-6">Pilihan 2: Gunakan Prompt Kustom</h3>
+                    <p class="text-gray-600">
+                        Contoh prompt: "Susun artikel dokumen 5000 kata dari file PDF ini dengan kalimat jurnalistik yang mudah dipahami dan akademis."
+                    </p>
+
+                    <h3 class="text-xl font-semibold text-blue-700 mt-6">Untuk Ringkasan Cepat</h3>
+                    <ul class="list-disc pl-6 text-gray-600">
+                        <li>Di bagian "Pilihan 1", tinggal klik aja judul file PDF yang kamu pilih.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer mt-4 flex justify-end">
+                    <button onclick="closeModal()" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-all">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('tutorialModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('tutorialModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('tutorialModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
