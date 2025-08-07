@@ -1,6 +1,7 @@
 # ailib
-AI Library
-
+--------------------------------------
+AI Library: https://hisabmu.com/ailib/
+--------------------------------------
 Inovasi Al-qur’an Digital-AI: Memahami Al-Qur'an Lebih Dekat dengan Aplikasi Pencarian Ayat Interaktif Basis AI
  
 Di era digital ini, teknologi kian memudahkan kita dalam berbagai aspek kehidupan, termasuk dalam mempelajari kitab suci Al-Qur'an. Sebuah inovasi hadir untuk membantu umat Muslim di seluruh dunia, yaitu sebuah aplikasi web pencarian ayat yang terintegrasi dengan berbagai fitur canggih. Aplikasi ini dirancang untuk memberikan pengalaman belajar yang lebih mendalam dan interaktif.
