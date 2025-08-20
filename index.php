@@ -31,28 +31,21 @@ function parsePdfFiles($html, $baseUrl) {
     $pdfFiles = [];
     $counter = 1;
 
-    // The content from the external sites is not always well-formed HTML,
-    // so using a DOM parser can fail. A regular expression is more robust
-    // for this specific task of extracting PDF links.
-    $regex = '/<a\s+href="([^"]+\.pdf)"[^>]*>(.*?)<\/a>/i';
+    // The content from the external sites is plain text, so we use a regex
+    // to find all full URLs that end in .pdf.
+    $regex = '/(https?:\/\/[^\s"]+?\.pdf)/i';
 
-    if (preg_match_all($regex, $html, $matches, PREG_SET_ORDER)) {
-        foreach ($matches as $match) {
-            $href = $match[1];
-            // The filename is the text content of the link.
-            $name = trim(strip_tags($match[2]));
+    if (preg_match_all($regex, $html, $matches)) {
+        // $matches[1] will contain all the captured URLs.
+        // Use array_unique to prevent duplicate entries.
+        $uniqueUrls = array_unique($matches[1]);
 
-            // If the link text is empty or just an image tag, fall back to the filename from the URL.
-            if (empty($name)) {
-                $name = basename(urldecode($href));
-            }
+        foreach ($uniqueUrls as $fullUrl) {
+            // Decode URL-encoded characters (like %20 for space) and then get the basename
+            $name = basename(urldecode($fullUrl));
 
-            // It's difficult to reliably get the file size with regex from malformed HTML,
-            // so we will default to 'Unknown'. The core functionality is listing the file.
+            // Size is not available in the source text, default to 'Unknown'
             $size = 'Unknown';
-
-            // Construct the full, absolute URL.
-            $fullUrl = strpos($href, 'http') === 0 ? $href : rtrim($baseUrl, '/') . '/' . ltrim($href, '/');
 
             $thumbnailUrl = get_generic_thumbnail_url();
 
@@ -617,7 +610,7 @@ $allPdfFilesJson = json_encode([
             ">
                 <i class="fas fa-star" style="color: #ffc107;"></i> Fitur Unggulan AI Library
             </h2>
-            
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                 <!-- Fitur 1 -->
                 <div style="
@@ -647,7 +640,7 @@ $allPdfFilesJson = json_encode([
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Fitur 2 -->
                 <div style="
                     background: white;
@@ -676,7 +669,7 @@ $allPdfFilesJson = json_encode([
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Fitur 3 -->
                 <div style="
                     background: white;
@@ -726,7 +719,7 @@ $allPdfFilesJson = json_encode([
     ">
         <i class="fas fa-graduation-cap" style="color: #FFA000;"></i> Tutorial Penggunaan
     </h2>
-    
+
     <div style="display: grid; grid-template-columns: 1fr; gap: 25px;">
         <!-- Langkah 1 -->
         <div style="
@@ -782,7 +775,7 @@ $allPdfFilesJson = json_encode([
                 </p>
             </div>
         </div>
-        
+
         <!-- Langkah 2 -->
         <div style="
             background: white;
@@ -841,7 +834,7 @@ $allPdfFilesJson = json_encode([
                 Mode Gambar akan menampilkan thumbnail cover buku untuk pengalaman browsing yang lebih visual.
             </p>
         </div>
-        
+
         <!-- Langkah 3 -->
         <div style="
             background: white;
@@ -925,7 +918,7 @@ $allPdfFilesJson = json_encode([
                 </p>
             </div>
         </div>
-        
+
         <!-- Langkah 4 -->
         <div style="
             background: white;
@@ -1006,7 +999,7 @@ $allPdfFilesJson = json_encode([
     ">
         <i class="fas fa-question-circle" style="color: #1976D2;"></i> Tips & Trik
     </h2>
-    
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
         <!-- Tip 1 -->
         <div style="
@@ -1037,7 +1030,7 @@ $allPdfFilesJson = json_encode([
                 Tambahkan kata kunci spesifik dalam prompt untuk hasil yang lebih relevan, seperti "astronomi", "hisab", atau "rukyat".
             </p>
         </div>
-        
+
         <!-- Tip 2 -->
         <div style="
             background: white;
@@ -1067,7 +1060,7 @@ $allPdfFilesJson = json_encode([
                 Untuk teks Arab, sertakan permintaan transliterasi dan terjemahan dalam prompt Anda.
             </p>
         </div>
-        
+
         <!-- Tip 3 -->
         <div style="
             background: white;
@@ -1097,7 +1090,7 @@ $allPdfFilesJson = json_encode([
                 Mintalah AI untuk menyusun hasil dalam format terstruktur dengan poin-poin penting dan sub-bagian.
             </p>
         </div>
-        
+
         <!-- Tip 4 -->
         <div style="
             background: white;
@@ -1280,8 +1273,8 @@ Susunkan naskah khutbah Jumat lengkap (6000 kata) tentang tema sesuai tema ebook
 
         function openFileModal(promptType) {
             currentPromptType = promptType;
-            currentSourceForModal = promptType === 'khutbahPrompt' 
-                ? document.getElementById('khutbahSourceSelect').value 
+            currentSourceForModal = promptType === 'khutbahPrompt'
+                ? document.getElementById('khutbahSourceSelect').value
                 : document.getElementById('customSourceSelect').value;
             displayFiles(currentSourceForModal, 'list', 'modalFileListContainer', true);
             document.getElementById('fileModal').style.display = 'flex';
